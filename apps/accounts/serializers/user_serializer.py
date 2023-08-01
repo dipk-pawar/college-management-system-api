@@ -55,3 +55,21 @@ class LoginSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
+
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "email": {"write_only": True},
+            "password": {"write_only": True},
+            "is_staff": {"read_only": True},
+            "is_admin": {"read_only": True},
+            "is_superuser": {"read_only": True},
+        }
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
