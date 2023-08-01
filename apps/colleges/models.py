@@ -5,8 +5,8 @@ from django.db import models
 class College(models.Model):
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=200)
-    established_date = models.DateField()
-    description = models.TextField()
+    established_date = models.DateField(null=True, blank=True)
+    description = models.TextField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return self.name

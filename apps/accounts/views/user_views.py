@@ -63,18 +63,7 @@ class RegisterUser(generics.CreateAPIView):
             status=status.HTTP_201_CREATED,
             data={
                 "error": False,
-                "data": [
-                    {
-                        "data": serializer.data,
-                        # "user_id": user_obj.get("id"),
-                        # "user_name": user_obj.get("username"),
-                        # "first_name": user_obj.get("first_name"),
-                        # "middle_name": user_obj.get("middle_name"),
-                        # "last_name": user_obj.get("last_name"),
-                        # "email": user_obj.get("email"),
-                        # "university_name": user_obj.get("university_id__name"),
-                    }
-                ],
+                "data": serializer.data,
                 "message": "User created successfully",
             },
         )
