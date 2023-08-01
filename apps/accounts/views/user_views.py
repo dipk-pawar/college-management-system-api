@@ -5,10 +5,13 @@ from apps.accounts.serializers.user_serializer import LoginSerializer, UserSeria
 from apps.common.error_helper import FormatError
 from cms.jwt_custom_token import get_tokens_for_user
 from django.db import transaction
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 # Create your views here.
 class Login(APIView):
+    permission_classes = (AllowAny,)
+
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         if not serializer.is_valid():
@@ -38,6 +41,7 @@ class Login(APIView):
 
 class RegisterUser(generics.CreateAPIView):
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):

@@ -3,6 +3,11 @@ from apps.accounts.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.contrib.auth import authenticate
+from apps.colleges.serializers.college_serializers import (
+    CollegeSerializer,
+    RoleSerializer,
+    CourseSerializer,
+)
 
 
 def validate_email_address(email):
@@ -58,6 +63,8 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    college = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -79,10 +86,25 @@ class UserSerializer(serializers.ModelSerializer):
             "is_superuser": {"read_only": True},
         }
 
+    def get_college(self, obj):
+        request = self.context.get("request")
+        return CollegeSerializer(request.user.college).data
+
     def create(self, validated_data):
+        request = self.context.get("request")
         courses = validated_data.get("courses", None)
+        validated_data["college"] = request.user.college
         validated_data.pop("courses", None)
         user = User.objects.create_user(**validated_data)
         if courses:
             user.courses.set(courses)
         return user
+
+    def to_representation(self, instance):
+        user_data = super().to_representation(instance)
+        user_data["courses"] = CourseSerializer(instance.courses.all(), many=True).data
+        user_data["role"] = (
+            RoleSerializer(instance.role).data if instance.role else None
+        )
+        user_data["role"]["college"] = instance.college.id
+        return user_data
