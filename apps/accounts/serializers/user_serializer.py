@@ -60,7 +60,15 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = "__all__"
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "college",
+            "role",
+            "courses",
+        ]
 
         extra_kwargs = {
             "id": {"read_only": True},
@@ -72,4 +80,9 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        courses = validated_data.get("courses", None)
+        validated_data.pop("courses", None)
+        user = User.objects.create_user(**validated_data)
+        if courses:
+            user.courses.set(courses)
+        return user
