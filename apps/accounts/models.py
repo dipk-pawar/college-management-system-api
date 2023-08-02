@@ -49,6 +49,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
+    class Meta:
+        permissions = [
+            ("view_User", "Can view User"),
+            ("add_User", "Can add User"),
+            ("change_User", "Can change User"),
+            ("delete_User", "Can delete User"),
+        ]
+
     def __str__(self):
         return self.email
 
