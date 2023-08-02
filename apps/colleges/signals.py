@@ -16,7 +16,7 @@ def custom_signal_receiver(sender, **kwargs):
             "last_name": request_data.get("last_name"),
             "college_id": int(request_data.get("college_id")),
             "role_id": 2,
-            "is_company_admin": True,
+            "is_college_admin": True,
         }
 
         User.objects.create_user(**extra_fields)

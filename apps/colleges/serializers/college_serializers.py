@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from apps.colleges.models import College, Role, Course
+from apps.accounts.models import User
 
 
 class CreateCollegeSerializer(serializers.ModelSerializer):
@@ -14,6 +15,26 @@ class CreateCollegeSerializer(serializers.ModelSerializer):
         return College.objects.create(
             name=validated_data.get("name"), location=validated_data.get("location")
         )
+
+
+class ReadCollegeAndAdminSerializer(serializers.ModelSerializer):
+    college_admin = serializers.SerializerMethodField()
+
+    class Meta:
+        model = College
+        fields = [
+            "id",
+            "name",
+            "location",
+            "established_date",
+            "description",
+            "college_admin",
+        ]
+
+    def get_college_admin(self, instance):
+        return User.objects.filter(
+            college_id=instance.id, is_college_admin=True
+        ).values("id", "first_name", "last_name", "email")
 
 
 class CollegeSerializer(serializers.ModelSerializer):

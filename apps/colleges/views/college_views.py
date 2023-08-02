@@ -1,6 +1,10 @@
 from rest_framework.response import Response
 from rest_framework import status, generics
-from apps.colleges.serializers.college_serializers import CreateCollegeSerializer
+from apps.colleges.serializers.college_serializers import (
+    CreateCollegeSerializer,
+    CollegeSerializer,
+    ReadCollegeAndAdminSerializer,
+)
 from apps.common.error_helper import FormatError
 from apps.common.helpers.user_helper import GeneratePassword
 from django.db import transaction
@@ -49,3 +53,15 @@ class CreateCollege(generics.CreateAPIView):
                 "message": "College created successfully",
             },
         )
+
+
+class CollegeList(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = CollegeSerializer
+    queryset = College.objects.all()
+
+
+class CollegeAndAdminList(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ReadCollegeAndAdminSerializer
+    queryset = College.objects.all()

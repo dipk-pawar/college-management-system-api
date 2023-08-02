@@ -88,7 +88,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_college(self, obj):
         request = self.context.get("request")
-        return CollegeSerializer(request.user.college).data
+        return CollegeSerializer(request.user.college).data if request else None
 
     def create(self, validated_data):
         request = self.context.get("request")
