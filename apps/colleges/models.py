@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group
+from django.core.validators import MinLengthValidator
 
 
 # Create your models here.
@@ -33,7 +34,7 @@ class Role(models.Model):
 
 
 class CollegeGroup(Group):
-    group_name = models.CharField(max_length=100)
+    group_name = models.CharField(max_length=100, blank=False, null=False)
     college = models.ForeignKey("colleges.college", on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True, max_length=200)
 

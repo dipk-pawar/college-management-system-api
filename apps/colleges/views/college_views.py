@@ -6,7 +6,7 @@ from apps.colleges.serializers.college_serializers import (
     ReadCollegeAndAdminSerializer,
 )
 from apps.common.error_helper import FormatError
-from apps.common.helpers.user_helper import GeneratePassword
+from apps.common.helpers.user_helper import GenerateRandomChar
 from django.db import transaction
 from rest_framework.permissions import IsAuthenticated
 from apps.colleges.signals import college_signal
@@ -42,7 +42,7 @@ class CreateCollege(generics.CreateAPIView):
             )
         serializer.save()
         request.data["college_id"] = serializer.data.get("id")
-        request.data["password"] = GeneratePassword.generate_password(12)
+        request.data["password"] = GenerateRandomChar.generate_password(12)
         college_signal.send(sender=College, request_data=request.data)
 
         return Response(
