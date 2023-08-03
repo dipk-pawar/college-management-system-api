@@ -4,11 +4,11 @@ from apps.common.error_helper import FormatError
 from rest_framework.permissions import IsAuthenticated
 from apps.accounts.models import User
 from apps.accounts.serializers.user_serializer import UserSerializer
-from apps.common.permissions import ObjectPermission
+from apps.common.permissions import APIPermission
 
 
 class CollegeUserList(generics.ListAPIView):
-    permission_classes = (IsAuthenticated, ObjectPermission)
+    permission_classes = (IsAuthenticated, APIPermission)
     serializer_class = UserSerializer
 
     def get_queryset(self):

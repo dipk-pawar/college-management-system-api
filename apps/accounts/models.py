@@ -49,20 +49,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
-    class Meta:
-        permissions = [
-            ("view_User", "Can view User"),
-            ("add_User", "Can add User"),
-            ("change_User", "Can change User"),
-            ("delete_User", "Can delete User"),
-        ]
-
     def __str__(self):
         return self.email
 
-    def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
+    def has_perms(self, perm, obj=None):
         return self.is_admin
 
     def has_module_perms(self, app_label):
@@ -75,3 +65,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             *self.get_user_permissions(obj),
             *self.get_group_permissions(obj),
         }
+
+    def has_api_permissions(self, perm):
+        return self.user_permissions.filter(codename=perm.lower()).exists()
