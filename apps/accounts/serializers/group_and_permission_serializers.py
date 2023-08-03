@@ -1,11 +1,12 @@
 # serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import Group
+from apps.colleges.models import CollegeGroup
 
 
-class GroupSerializer(serializers.ModelSerializer):
+class CollegeGroupSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Group
+        model = CollegeGroup
         fields = "__all__"
 
     def to_representation(self, instance):

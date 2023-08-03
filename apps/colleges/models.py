@@ -33,8 +33,13 @@ class Role(models.Model):
 
 
 class CollegeGroup(Group):
-    description = models.TextField(blank=True, null=True, max_length=200)
+    group_name = models.CharField(max_length=100)
     college = models.ForeignKey("colleges.college", on_delete=models.CASCADE)
+    description = models.TextField(blank=True, null=True, max_length=200)
 
     class Meta:
         db_table = "college_group"
+        unique_together = (
+            "college",
+            "group_name",
+        )
