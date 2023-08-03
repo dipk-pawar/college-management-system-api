@@ -3,6 +3,11 @@
 from rest_framework.permissions import BasePermission
 
 
+class SuperUserORAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user.is_superuser or request.user.is_college_admin)
+
+
 class APIPermission(BasePermission):
     def get_queryset_model_name(self, view):
         # Get the queryset attribute from the view and return the model name
@@ -31,9 +36,7 @@ class APIPermission(BasePermission):
         # Get the required permission code based on the requested method
         required_permission = permission_codes.get(request.method)
 
-        if has_required_group_permission := self.has_group_permission(
-            request.user, required_permission
-        ):
+        if _ := self.has_group_permission(request.user, required_permission):
             return True
 
         """If the user doesn't have the required group permission, 

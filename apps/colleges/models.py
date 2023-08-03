@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import Group, Permission
 
 
 # Create your models here.
@@ -29,3 +30,11 @@ class Role(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CollegeGroup(Group):
+    description = models.TextField(blank=True, null=True, max_length=200)
+    college = models.ForeignKey("colleges.college", on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "college_group"
