@@ -1,7 +1,7 @@
 from django.urls import path
 from .views.college_views import CreateCollege, CollegeList, CollegeAndAdminList
 from .views.student_views import CollegeUserList
-from .views.group_and_permission_views import CollegeGroupViewSet
+from .views.group_and_permission_views import CollegeGroupViewSet, PermissionListView
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -20,4 +20,5 @@ urlpatterns = [
         CollegeUserList.as_view(),
         name="college-user-list",
     ),
+    path("permission-list/", PermissionListView.as_view(), name="permission-list"),
 ] + router.urls

@@ -52,4 +52,8 @@ class CollegeGroupSerializer(serializers.ModelSerializer):
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
-        fields = ["id", "name", "content_type", "codename"]
+        fields = ["id", "name", "content_type_id", "codename"]
+
+    # def to_representation(self, instance):
+    #     permission_data = super().to_representation(instance)
+    #     print(permission_data)

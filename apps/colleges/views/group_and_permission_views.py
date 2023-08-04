@@ -1,5 +1,5 @@
 # views.py
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from apps.colleges.serializers.group_and_permission_serializers import (
     CollegeGroupSerializer,
     PermissionSerializer,
@@ -10,6 +10,7 @@ from django.contrib.auth.models import Permission
 from rest_framework.views import APIView
 from apps.accounts.models import User
 from apps.colleges.models import College, Course, Role
+from rest_framework.response import Response
 
 
 class CollegeGroupViewSet(viewsets.ModelViewSet):
@@ -24,12 +25,23 @@ class CollegeGroupViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class PermissionListView(APIView):
-    def get(self, request):
-        # List of models you want to show permissions for
-        allowed_models = [User, College, Course, Role]
+class PermissionListView(generics.ListAPIView):
+    serializer_class = PermissionSerializer
 
-        # Filter permissions based on the allowed models
-        permissions = Permission.objects.filter(content_type__model__in=allowed_models)
-        serializer = PermissionSerializer(permissions, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Permission.objects.all()
+        allowed_models = ["user", "course", "role", "collegegroup"]
+        return Permission.objects.filter(content_type__model__in=allowed_models)
+
+
+# class PermissionListView(APIView):
+#     def get(self, request):
+#         # List of models you want to show permissions for
+#         allowed_models = [User, College, Course, Role]
+
+#         # Filter permissions based on the allowed models
+#         permissions = Permission.objects.filter(content_type__model__in=allowed_models)
+#         serializer = PermissionSerializer(permissions, many=True)
+#         return Response(serializer.data)
