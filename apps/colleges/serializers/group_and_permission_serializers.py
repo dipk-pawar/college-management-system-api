@@ -1,6 +1,6 @@
 # serializers.py
 from rest_framework import serializers
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from apps.colleges.models import CollegeGroup
 from apps.common.helpers.user_helper import GenerateRandomChar
 from django.db import IntegrityError
@@ -47,3 +47,9 @@ class CollegeGroupSerializer(serializers.ModelSerializer):
             "permissions__content_type_id",
         )
         return group_data
+
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ["id", "name", "content_type", "codename"]
