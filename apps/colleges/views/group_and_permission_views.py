@@ -7,10 +7,7 @@ from apps.colleges.serializers.group_and_permission_serializers import (
 from apps.common.permissions import SuperUserORAdmin
 from apps.colleges.models import CollegeGroup
 from django.contrib.auth.models import Permission
-from rest_framework.views import APIView
-from apps.accounts.models import User
-from apps.colleges.models import College, Course, Role
-from rest_framework.response import Response
+from apps.common.constant import ModelsName
 
 
 class CollegeGroupViewSet(viewsets.ModelViewSet):
@@ -32,8 +29,9 @@ class PermissionListView(generics.ListAPIView):
         user = self.request.user
         if user.is_superuser:
             return Permission.objects.all()
-        allowed_models = ["user", "course", "role", "collegegroup"]
-        return Permission.objects.filter(content_type__model__in=allowed_models)
+        return Permission.objects.filter(
+            content_type__model__in=ModelsName.allow_models
+        )
 
 
 # class PermissionListView(APIView):

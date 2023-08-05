@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group, Permission
 from apps.colleges.models import CollegeGroup
 from apps.common.helpers.user_helper import GenerateRandomChar
 from django.db import IntegrityError
+from apps.common.constant import ModelsName
 
 
 class CollegeGroupSerializer(serializers.ModelSerializer):
@@ -17,6 +18,7 @@ class CollegeGroupSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs):
+        request_user = self.context.get("request").user
         group_name = attrs.get("group_name")
         permissions = attrs.get("permissions")
         if len(group_name) <= 2:
@@ -27,6 +29,21 @@ class CollegeGroupSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"message": "Please assign atlist 1 permission"}
             )
+        permissions_list = list(map(lambda permission: permission.id, permissions))
+        if not request_user.is_superuser:
+            allowed_user_permissions = list(
+                Permission.objects.filter(
+                    content_type__model__in=ModelsName.allow_models
+                ).values_list("id", flat=True)
+            )
+
+            for permission in permissions_list:
+                if permission not in allowed_user_permissions:
+                    raise serializers.ValidationError(
+                        {
+                            "message": f"Sorry, can not assign the permission {permission}"
+                        }
+                    )
 
         return attrs
 
@@ -64,7 +81,3 @@ class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
         fields = ["id", "name", "content_type_id", "codename"]
-
-    # def to_representation(self, instance):
-    #     permission_data = super().to_representation(instance)
-    #     print(permission_data)
