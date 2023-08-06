@@ -6,6 +6,7 @@ from apps.common.error_helper import FormatError
 from cms.jwt_custom_token import get_tokens_for_user
 from django.db import transaction
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from apps.common.permissions import SuperUserORAdmin
 
 
 # Create your views here.
@@ -41,7 +42,7 @@ class Login(APIView):
 
 class RegisterUser(generics.CreateAPIView):
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, SuperUserORAdmin)
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):

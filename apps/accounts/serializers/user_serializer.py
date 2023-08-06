@@ -8,6 +8,8 @@ from apps.colleges.serializers.college_serializers import (
     RoleSerializer,
     CourseSerializer,
 )
+from apps.common.helpers.user_helper import GenerateRandomChar
+from apps.colleges.models import Role
 
 
 def validate_email_address(email):
@@ -86,6 +88,23 @@ class UserSerializer(serializers.ModelSerializer):
             "is_superuser": {"read_only": True},
         }
 
+    def validate(self, attrs):
+        request_user = self.context.get("request").user
+        roles = list(
+            Role.objects.filter(college_id=request_user.college.id).values_list(
+                "id", flat=True
+            )
+        )
+        if "role" in attrs:
+            role_id = attrs["role"].id
+            if role_id not in roles:
+                raise serializers.ValidationError(
+                    {
+                        "error": "Sorry, role not found, Create a role before assigning it"
+                    }
+                )
+        return super().validate(attrs)
+
     def get_college(self, obj):
         request = self.context.get("request")
         return CollegeSerializer(request.user.college).data if request else None
@@ -95,6 +114,7 @@ class UserSerializer(serializers.ModelSerializer):
         courses = validated_data.get("courses", None)
         validated_data["college"] = request.user.college
         validated_data.pop("courses", None)
+        validated_data["password"] = GenerateRandomChar.generate_password(12)
         user = User.objects.create_user(**validated_data)
         if courses:
             user.courses.set(courses)
