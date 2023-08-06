@@ -59,7 +59,6 @@ class RegisterUser(generics.CreateAPIView):
             )
         serializer.save()
 
-        # check it university id is available
         return Response(
             status=status.HTTP_201_CREATED,
             data={
