@@ -15,7 +15,6 @@ def custom_signal_receiver(sender, **kwargs):
             "first_name": request_data.get("first_name"),
             "last_name": request_data.get("last_name"),
             "college_id": int(request_data.get("college_id")),
-            "role_id": 2,
             "is_college_admin": True,
         }
 

@@ -86,24 +86,28 @@ class UserSerializer(serializers.ModelSerializer):
             "is_staff": {"read_only": True},
             "is_admin": {"read_only": True},
             "is_superuser": {"read_only": True},
+            "college": {"required": True},
+            "role": {"required": True},
+            "courses": {"required": True},
         }
 
-    def validate(self, attrs):
-        request_user = self.context.get("request").user
-        roles = list(
-            Role.objects.filter(college_id=request_user.college.id).values_list(
-                "id", flat=True
+    def to_internal_value(self, data):
+        role_id = data.get("role")
+        if role_id is not None:
+            request_user = self.context.get("request").user
+            roles = list(
+                Role.objects.filter(college_id=request_user.college.id).values_list(
+                    "id", flat=True
+                )
             )
-        )
-        if "role" in attrs:
-            role_id = attrs["role"].id
             if role_id not in roles:
                 raise serializers.ValidationError(
                     {
-                        "error": "Sorry, role not found, Create a role before assigning it"
+                        "role": "Sorry, role not found. Create a role before assigning it."
                     }
                 )
-        return super().validate(attrs)
+
+        return super().to_internal_value(data)
 
     def get_college(self, obj):
         request = self.context.get("request")

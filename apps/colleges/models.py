@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import Group
-from django.core.validators import MinLengthValidator
 
 
 # Create your models here.
@@ -17,20 +16,23 @@ class College(models.Model):
 class Course(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    college = models.ForeignKey("colleges.College", on_delete=models.DO_NOTHING)
+    college = models.ForeignKey("colleges.College", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
 
 class Role(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     college = models.ForeignKey(
-        "colleges.College", null=True, blank=True, on_delete=models.DO_NOTHING
+        "colleges.College", null=True, blank=True, on_delete=models.CASCADE
     )
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        unique_together = ("name", "college")
 
 
 class CollegeGroup(Group):
@@ -48,8 +50,8 @@ class CollegeGroup(Group):
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
-    course = models.ForeignKey("colleges.Course", on_delete=models.DO_NOTHING)
-    college = models.ForeignKey("colleges.College", on_delete=models.DO_NOTHING)
+    course = models.ForeignKey("colleges.Course", on_delete=models.CASCADE)
+    college = models.ForeignKey("colleges.College", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

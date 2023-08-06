@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from rest_framework import serializers
 from apps.colleges.models import College, Role, Course
 from apps.accounts.models import User
@@ -46,7 +47,21 @@ class CollegeSerializer(serializers.ModelSerializer):
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
-        fields = "__all__"
+        fields = ["id", "name"]
+        extra_kwargs = {"id": {"read_only": True}, "name": {"required": True}}
+
+    def create(self, validated_data):
+        user = self.context.get("request").user
+        try:
+            return Role.objects.create(
+                name=validated_data.get("name"), college_id=user.college.id
+            )
+        except IntegrityError as e:
+            raise serializers.ValidationError(
+                {
+                    "error": f"Role name {validated_data.get('name')} already exists for this college"
+                }
+            ) from e
 
 
 class CourseSerializer(serializers.ModelSerializer):

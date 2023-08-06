@@ -4,16 +4,18 @@ from apps.colleges.serializers.college_serializers import (
     CreateCollegeSerializer,
     CollegeSerializer,
     ReadCollegeAndAdminSerializer,
+    RoleSerializer,
 )
 from apps.common.error_helper import FormatError
 from apps.common.helpers.user_helper import GenerateRandomChar
 from django.db import transaction
 from rest_framework.permissions import IsAuthenticated
 from apps.colleges.signals import college_signal
-from apps.colleges.models import College
+from apps.colleges.models import College, Role
 from apps.accounts.models import User
 from apps.accounts.serializers.user_serializer import UserSerializer
-from apps.common.permissions import APIPermission
+from apps.common.permissions import APIPermission, SuperUserORAdmin
+from rest_framework import viewsets, generics
 
 
 class CreateCollege(generics.CreateAPIView):
@@ -47,6 +49,7 @@ class CreateCollege(generics.CreateAPIView):
         request.data["college_id"] = serializer.data.get("id")
         request.data["password"] = GenerateRandomChar.generate_password(12)
         college_signal.send(sender=College, request_data=request.data)
+        print(request.data)
 
         return Response(
             status=status.HTTP_201_CREATED,
@@ -83,4 +86,19 @@ class CollegeUserList(generics.ListAPIView):
                 queryset = queryset.filter(
                     role_id=int(role_id), college_id=user.college.id
                 )
+        return queryset
+
+
+class RoleViewSet(viewsets.ModelViewSet):
+    permission_classes = (
+        IsAuthenticated,
+        SuperUserORAdmin,
+    )
+    serializer_class = RoleSerializer
+
+    def get_queryset(self):
+        queryset = Role.objects.all()
+        user = self.request.user
+        if not user.is_superuser:
+            queryset = queryset.filter(college_id=user.college.id)
         return queryset

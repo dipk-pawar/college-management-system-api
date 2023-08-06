@@ -35,8 +35,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    college = models.ForeignKey("colleges.College", on_delete=models.DO_NOTHING)
-    role = models.ForeignKey("colleges.Role", on_delete=models.DO_NOTHING)
+    college = models.ForeignKey(
+        "colleges.College", null=True, blank=True, on_delete=models.CASCADE
+    )
+    role = models.ForeignKey(
+        "colleges.Role", null=True, blank=True, on_delete=models.CASCADE
+    )
     courses = models.ManyToManyField("colleges.Course", related_name="user")
     is_active = models.BooleanField(default=True)
     is_college_admin = models.BooleanField(default=False)
