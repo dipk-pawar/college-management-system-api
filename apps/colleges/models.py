@@ -17,7 +17,7 @@ class College(models.Model):
 class Course(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    college = models.ForeignKey("colleges.college", on_delete=models.DO_NOTHING)
+    college = models.ForeignKey("colleges.College", on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.name
@@ -26,7 +26,7 @@ class Course(models.Model):
 class Role(models.Model):
     name = models.CharField(max_length=50, unique=True)
     college = models.ForeignKey(
-        "colleges.college", null=True, blank=True, on_delete=models.DO_NOTHING
+        "colleges.College", null=True, blank=True, on_delete=models.DO_NOTHING
     )
 
     def __str__(self):
@@ -35,7 +35,7 @@ class Role(models.Model):
 
 class CollegeGroup(Group):
     group_name = models.CharField(max_length=100, blank=False, null=False)
-    college = models.ForeignKey("colleges.college", on_delete=models.CASCADE)
+    college = models.ForeignKey("colleges.College", on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True, max_length=200)
 
     class Meta:
@@ -44,3 +44,12 @@ class CollegeGroup(Group):
             "college",
             "group_name",
         )
+
+
+class Subject(models.Model):
+    name = models.CharField(max_length=100)
+    Course = models.ForeignKey("colleges.Course", on_delete=models.DO_NOTHING)
+    college = models.ForeignKey("colleges.College", on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return self.name

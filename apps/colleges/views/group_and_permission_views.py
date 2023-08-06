@@ -32,14 +32,3 @@ class PermissionListView(generics.ListAPIView):
         return Permission.objects.filter(
             content_type__model__in=ModelsName.allow_models
         )
-
-
-# class PermissionListView(APIView):
-#     def get(self, request):
-#         # List of models you want to show permissions for
-#         allowed_models = [User, College, Course, Role]
-
-#         # Filter permissions based on the allowed models
-#         permissions = Permission.objects.filter(content_type__model__in=allowed_models)
-#         serializer = PermissionSerializer(permissions, many=True)
-#         return Response(serializer.data)
