@@ -48,7 +48,7 @@ class CollegeGroup(Group):
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
-    Course = models.ForeignKey("colleges.Course", on_delete=models.DO_NOTHING)
+    course = models.ForeignKey("colleges.Course", on_delete=models.DO_NOTHING)
     college = models.ForeignKey("colleges.College", on_delete=models.DO_NOTHING)
 
     def __str__(self):

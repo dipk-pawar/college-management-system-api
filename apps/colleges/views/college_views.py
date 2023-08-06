@@ -11,6 +11,9 @@ from django.db import transaction
 from rest_framework.permissions import IsAuthenticated
 from apps.colleges.signals import college_signal
 from apps.colleges.models import College
+from apps.accounts.models import User
+from apps.accounts.serializers.user_serializer import UserSerializer
+from apps.common.permissions import APIPermission
 
 
 class CreateCollege(generics.CreateAPIView):
@@ -65,3 +68,19 @@ class CollegeAndAdminList(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ReadCollegeAndAdminSerializer
     queryset = College.objects.all()
+
+
+class CollegeUserList(generics.ListAPIView):
+    permission_classes = (IsAuthenticated, APIPermission)
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        user = self.request.user
+        if not user.is_superuser:
+            role_id = self.request.query_params.get("role_id", None)
+            if role_id is not None:
+                queryset = queryset.filter(
+                    role_id=int(role_id), college_id=user.college.id
+                )
+        return queryset

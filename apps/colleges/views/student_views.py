@@ -1,24 +1,22 @@
 from rest_framework.response import Response
 from rest_framework import status, generics
+from apps.colleges.serializers.student_serializers import SubjectSerializer
 from apps.common.error_helper import FormatError
+from django.db import transaction
 from rest_framework.permissions import IsAuthenticated
-from apps.accounts.models import User
-from apps.accounts.serializers.user_serializer import UserSerializer
 from apps.common.permissions import APIPermission
+from apps.colleges.models import Subject
 
 
-class CollegeUserList(generics.ListAPIView):
-    permission_classes = (IsAuthenticated, APIPermission)
-    serializer_class = UserSerializer
+class CourseList(generics.ListAPIView):
+    serializer_class = SubjectSerializer
 
     def get_queryset(self):
-        queryset = User.objects.all()
         user = self.request.user
-        print(user)
-        if user.role_id != 1:
-            role_id = self.request.query_params.get("role_id", None)
-            if role_id is not None:
-                queryset = queryset.filter(
-                    role_id=int(role_id), college_id=user.college.id
-                )
-        return queryset
+        return (
+            Subject.objects.all()
+            if user.is_superuser
+            else Subject.objects.filter(
+                college_id=user.college_id, course__in=user.courses.all()
+            )
+        )

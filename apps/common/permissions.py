@@ -25,6 +25,8 @@ class APIPermission(BasePermission):
         )
 
     def has_permission(self, request, view):
+        if request.user.is_superuser:
+            return True
         model_name = self.get_queryset_model_name(view)
         permission_codes = {
             "GET": f"view_{model_name}",
