@@ -9,7 +9,6 @@ from apps.colleges.serializers.college_serializers import (
     CourseSerializer,
 )
 from apps.common.helpers.custom_exeception_helper import ExceptionError
-from apps.common.helpers.user_helper import GenerateRandomChar
 from apps.colleges.models import Course, Role
 
 
@@ -105,22 +104,11 @@ class UserSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         return CollegeSerializer(request.user.college).data if request else None
 
-    # def create(self, validated_data):
-    #     request = self.context.get("request")
-    #     courses = validated_data.get("courses", None)
-    #     validated_data["college"] = request.user.college
-    #     validated_data.pop("courses", None)
-    #     validated_data["password"] = GenerateRandomChar.generate_password(12)
-    #     user = User.objects.create_user(**validated_data)
-    #     if courses:
-    #         user.courses.set(courses)
-    #     return user
-
-    # def to_representation(self, instance):
-    #     user_data = super().to_representation(instance)
-    #     user_data["courses"] = CourseSerializer(instance.courses.all(), many=True).data
-    #     user_data["role"] = (
-    #         RoleSerializer(instance.role).data if instance.role else None
-    #     )
-    #     user_data["role"]["college"] = instance.college.id
-    #     return user_data
+    def to_representation(self, instance):
+        user_data = super().to_representation(instance)
+        user_data["courses"] = CourseSerializer(instance.courses.all(), many=True).data
+        user_data["role"] = (
+            RoleSerializer(instance.role).data if instance.role else None
+        )
+        user_data["role"]["college"] = instance.college.id
+        return user_data

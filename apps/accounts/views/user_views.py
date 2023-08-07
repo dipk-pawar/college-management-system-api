@@ -2,7 +2,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, generics
 from apps.accounts.serializers.user_serializer import LoginSerializer, UserSerializer
-from apps.common.error_helper import FormatError
 from apps.common.helpers.user_helper import GenerateRandomChar
 from cms.jwt_custom_token import get_tokens_for_user
 from django.db import transaction
