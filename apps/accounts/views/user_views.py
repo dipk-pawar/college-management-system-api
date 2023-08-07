@@ -7,25 +7,17 @@ from cms.jwt_custom_token import get_tokens_for_user
 from django.db import transaction
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from apps.common.permissions import SuperUserORAdmin
+from apps.common.helpers.error_decorator import track_error
 
 
 # Create your views here.
 class Login(APIView):
     permission_classes = (AllowAny,)
 
+    @track_error(validate_api_parameters=["email", "password"])
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(
-                {
-                    "error": True,
-                    "message": FormatError.format_serializer_errors(
-                        errors=serializer.errors
-                    ),
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
+        serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         tokens = get_tokens_for_user(user=user)
 

@@ -8,6 +8,7 @@ from apps.colleges.serializers.college_serializers import (
     RoleSerializer,
     CourseSerializer,
 )
+from apps.common.helpers.custom_exeception_helper import ExceptionError
 from apps.common.helpers.user_helper import GenerateRandomChar
 from apps.colleges.models import Role
 
@@ -26,40 +27,29 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(style={"input_type": "password"})
 
+    def is_valid(self, raise_exception=False):
+        email = self.initial_data.get("email")
+        try:
+            validate_email(email)
+        except:
+            raise ExceptionError("Email is not valid")
+        return super(LoginSerializer, self).is_valid(raise_exception=raise_exception)
+
     def validate(self, attrs):
         email = attrs.get("email")
-        password = attrs.get("password")
-
-        if not email or not password:
-            raise serializers.ValidationError(
-                {"error": 'Must include "email" and "password".'},
-                code="authorization",
-            )
-
-        email = validate_email_address(email)
         user = User.objects.filter(email=email).first()
 
         if not user:
-            raise serializers.ValidationError(
-                {"error": "Unable to log in with provided credentials."},
-                code="authentication_failed",
-            )
+            raise ExceptionError("Unable to log in with provided credentials.")
 
         if not user.is_active:
-            raise serializers.ValidationError(
-                {
-                    "error": "Your account is not active please contact admin for more details."
-                },
-                code="authentication_failed",
+            raise ExceptionError(
+                "Your account is not active please contact admin for more details."
             )
-
+        password = attrs.get("password")
         user = authenticate(email=email, password=password)
         if not user:
-            raise serializers.ValidationError(
-                {"error": "Unable to log in with provided credentials."},
-                code="authentication_failed",
-            )
-
+            raise ExceptionError("Unable to log in with provided credentials.")
         attrs["user"] = user
         return attrs
 
