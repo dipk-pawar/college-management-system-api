@@ -3,7 +3,7 @@
 from rest_framework.permissions import BasePermission
 
 
-class SuperUserORAdmin(BasePermission):
+class SuperUser(BasePermission):
     def has_permission(self, request, view):
         return bool(request.user.is_superuser)
 
